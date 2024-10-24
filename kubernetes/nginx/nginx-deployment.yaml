@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: nginx
-          image: "${DOCKERHUB_USERNAME}/my-nginx-site:latest"
+          image: "aduka27/my-nginx-site:latest"
           ports:
             - containerPort: 80
           volumeMounts:
