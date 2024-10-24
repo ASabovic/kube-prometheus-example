@@ -49,13 +49,14 @@ jobs:
       - name: Create directories on Raspberry Pi 5
         run: |
           ssh -o StrictHostKeyChecking=no -p ${{ secrets.ROUTER_PORT }} ${{ secrets.PI_USERNAME }}@${{ secrets.ROUTER_IP }} << 'EOF'
-            mkdir -p kube-project
+            mkdir -p kube-project/nginx/
+            mkdir -p kube-project/monitoring
           EOF
       
       - name: Copy Kubernetes files to Raspberry Pi 5
         run: | 
-          scp -P ${{ secrets.ROUTER_PORT }} ./kubernetes/nginx/* ${{ secrets.PI_USERNAME }}@${{ secrets.ROUTER_IP }}:/home/${{ secrets.PI_USERNAME }}/kube-project/
-          scp -P ${{ secrets.ROUTER_PORT }} ./kubernetes/monitoring/* ${{ secrets.PI_USERNAME }}@${{ secrets.ROUTER_IP }}:/home/${{ secrets.PI_USERNAME }}/kube-project/ 
+          scp -P ${{ secrets.ROUTER_PORT }} ./kubernetes/nginx/* ${{ secrets.PI_USERNAME }}@${{ secrets.ROUTER_IP }}:/home/${{ secrets.PI_USERNAME }}/kube-project/nginx/
+          scp -P ${{ secrets.ROUTER_PORT }} ./kubernetes/monitoring/* ${{ secrets.PI_USERNAME }}@${{ secrets.ROUTER_IP }}:/home/${{ secrets.PI_USERNAME }}/kube-project/monitoring/ 
 
       - name: Install Prometheus and Grafana stack
         run: |
@@ -63,6 +64,7 @@ jobs:
             helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
             helm repo update
             helm upgrade --install prometheus prometheus-community/kube-prometheus-stack -f /home/${{ secrets.PI_USERNAME }}/kube-project/values.yaml
-            kubectl apply -f -f /home/${{ secrets.PI_USERNAME }}/kube-project/nginx-deployment.yaml
-            kubectl apply -f -f /home/${{ secrets.PI_USERNAME }}/kube-project/nginx-exporter-deployment.yaml
+            # kubectl apply -f /home/${{ secrets.PI_USERNAME }}/kube-project/nginx-deployment.yaml
+            # kubectl apply -f /home/${{ secrets.PI_USERNAME }}/kube-project/nginx-exporter-deployment.yaml
+            kubectl apply -f /home/${{ secrets.PI_USERNAME }}/kube-project/nginx/
           EOF
